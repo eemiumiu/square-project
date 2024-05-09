@@ -1,0 +1,1 @@
+Both projects should be opened separately with PlatformIO

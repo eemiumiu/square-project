@@ -1,1 +1,0 @@
-Both projects should be opened with PlatformIO
