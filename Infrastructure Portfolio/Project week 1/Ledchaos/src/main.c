@@ -2,13 +2,13 @@
 #define __DELAY_BACKWARD_COMPATIBLE__
 #include <util/delay.h>
 #include <avr/io.h>
-#include <usart.h>
-#include <led.h>
 #include <stdlib.h>
 
+#include <usart.h>
+#include <led.h>
+
 // !!!!
-// I believe for a teacher to test this, they should change the  
-// path of the lib_extra_dirs in platformio.ini, because 
+// the lib_extra_dirs in platformio.ini, may give an error because 
 // on Mac and on Windows, path sidebars are diffrent ( / and \ ).
 
 #define NUMBER_OF_LEDS 4

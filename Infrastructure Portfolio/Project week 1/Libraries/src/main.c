@@ -1,13 +1,13 @@
 #include <Arduino.h>
 #include <util/delay.h>
 #include <avr/io.h>
+
 #include <usart.h>
 #include <led.h>
 
 // !!!!
-// I believe for a teacher to test this, they should change the  
-// path of the lib_extra_dirs in platformio.ini, because 
-// on Mac and on Windows, path sidebars are diffrent ( / and \ ). 
+// the lib_extra_dirs in platformio.ini, may give an error because 
+// on Mac and on Windows, path sidebars are diffrent ( / and \ ).
 
 int main()
 {
