@@ -18,7 +18,7 @@ void lightUpLed ( int lednumber )
 
 void lightDownLed ( int lednumber )
 {
-    if ( lednumber < 0 || lednumber > 3 ) return;
+    if ( lednumber < 0 || lednumber > NUMBER_OF_LEDS-1 ) return;
     PORTB |= ( 1 << ( PB2 + lednumber ));   
 }
 

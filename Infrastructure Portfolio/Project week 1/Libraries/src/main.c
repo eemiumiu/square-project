@@ -14,8 +14,9 @@ int main()
   initUSART();
   printf ("Testing led library functions\n");
 
-  enableLed(1);
-  enableMultipleLeds(0b00001101); 
+  lightDownLed(1);
+  enableLed(0);
+  // enableMultipleLeds(0b00001101); 
   enableAllLeds();
 
   while(1)
