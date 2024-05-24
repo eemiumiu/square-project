@@ -11,15 +11,15 @@
 int main()
 {
     initUSART();
-    DDRC &= ~_BV( PC1 );    /* Set up DDR, instead of using ( 1 << PC1 ) we use the
+    DDRC &= ~_BV( PC2 );    /* Set up DDR, instead of using ( 1 << PC1 ) we use the
                              * macro _BV( bit ). (BV stands for "Bit Value") */
     #ifdef DEBUG            // The following code is only printed when DEBUG is defined
     printf( "DDRC: " );
     printBinaryByte( DDRC );
     #endif
 
-    PORTC |= _BV( PC1 );    /* Activate pull-up of C1.
-                             * We use the macro _BV( bit ) instead of ( 1 << PC 1 ) */
+    PORTC |= _BV( PC2 );    /* Activate pull-up of C1.
+                             * We use the macro _BV( bit ) instead of ( 1 << PC1 ) */
     #ifdef DEBUG
     printf( "\nPORTC: " );
     printBinaryByte( PORTC );
@@ -31,7 +31,9 @@ int main()
         printBinaryByte( PINC );
         if ( bit_is_clear( PINC, PC1 )) /* instead of (!(PINC & ( 1 << PC1 ))) we use the macro bit_is_clear */
         {
+            #ifdef DEBUG
             printf( " - Button 1 pressed!\n" );
+            #endif
         }
         else
         {

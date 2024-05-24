@@ -20,10 +20,10 @@ void writeMask( volatile uint8_t* registerr, uint8_t bitmask )
 
 int main()
 {
-int lednumber = 0;
+    int lednumber = 0;
 
-uint8_t bitmask = ( 1 << ( PB2 + lednumber ));  //prepare a bitmask
-writeMask( &DDRB, bitmask );                     // Write the bitmask to the register
+    uint8_t bitmask = ( 1 << ( PB2 + lednumber ));  //prepare a bitmask
+    writeMask( &DDRB, bitmask );                     // Write the bitmask to the register
 
-return 0;
+    return 0;
 }
