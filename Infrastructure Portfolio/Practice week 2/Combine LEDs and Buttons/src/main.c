@@ -27,7 +27,7 @@ ISR(PCINT1_vect)
             led0state = false;
         }
     }
-
+    // if button 2 is pressed
     if(bit_is_clear(PINC,PC2))
     {
         if(!led1state)
@@ -39,6 +39,7 @@ ISR(PCINT1_vect)
             led1state = false;
         }
     }
+    // if button 3 is pressed
     if(bit_is_clear(PINC,PC3))
     { 
         if(!led2state)
@@ -50,6 +51,13 @@ ISR(PCINT1_vect)
             led2state = false;
         }
     } 
+}
+void flicker(uint8_t leds)
+{
+    lightUpMultipleLeds(leds);
+    _delay_ms(100);
+    lightDownMultipleLeds(leds);
+    _delay_ms(100);
 }
 
 int main()
@@ -78,58 +86,27 @@ int main()
     {
         // with 1 led
         if(led0state && !led1state && !led2state)
-        {
-            lightUpLed(0);
-            _delay_ms(100);
-            lightDownLed(0);
-            _delay_ms(100);
-        }
+        flicker(0b00000001);
+
         if(!led0state && led1state && !led2state)
-        {
-            lightUpLed(1);
-            _delay_ms(100);
-            lightDownLed(1);
-            _delay_ms(100);
-        }
+        flicker(0b00000010);
+        
         if(!led0state && !led1state && led2state)
-        {
-            lightUpLed(2);
-            _delay_ms(100);
-            lightDownLed(2);
-            _delay_ms(100);
-        }
+        flicker(0b00000100);
 
         // with 2 leds
         if(led0state && led1state && !led2state) 
-        {
-            lightUpMultipleLeds(0b00000011);
-            _delay_ms(100);
-            lightDownMultipleLeds(0b00000011);
-            _delay_ms(100);
-        }  
+        flicker(0b00000011);
+        
         if(!led0state && led1state && led2state) 
-        {
-            lightUpMultipleLeds(0b00000110);
-            _delay_ms(100);
-            lightDownMultipleLeds(0b00000110);
-            _delay_ms(100);
-        }
+        flicker(0b00000110);
+        
         if(led0state && !led1state && led2state) 
-        {
-            lightUpMultipleLeds(0b00000101);
-            _delay_ms(100);
-            lightDownMultipleLeds(0b00000101);
-            _delay_ms(100);
-        }
-
+        flicker(0b00000101);
+        
         // with 3 leds          
         if(led0state && led1state && led2state) 
-        {
-            lightUpMultipleLeds(0b00000111);
-            _delay_ms(100);
-            lightDownMultipleLeds(0b00000111);
-            _delay_ms(100);
-        }     
+        flicker(0b00000111);  
 
         _delay_ms(100);
     }
