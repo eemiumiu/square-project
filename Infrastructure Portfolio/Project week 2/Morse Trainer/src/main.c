@@ -7,8 +7,6 @@
 #include <led.h>
 #include <button.h>
 
-#include <stdlib.h>
-#include <time.h>
 #include <stdbool.h>
 
 extern char choice1 = '-';
@@ -42,7 +40,6 @@ ISR(PCINT1_vect)
         selected = 2;
         pressed = true;
     }
-
     // if button 3 is pressed
     if(bit_is_clear(PINC,PC3))
     {
@@ -76,7 +73,7 @@ int main()
     for(int i = 0; i < 5; i++)
     {
         _delay_ms(1500);
-        printf("Guess the morse characters: \n\n");
+        printf("Guess the morse character: \n\n");
         _delay_ms(100);
 
         letter_lit = answers[randomChoice()];
@@ -100,13 +97,11 @@ int main()
 
         pressed = false;
 
-    }// end for loop
+    }
 
     printf("END GAME");
 
-    /* 5 times - score: 5 */
-
-    // lightdance();
+    lightdance();
 }
 
 void assignPicks()
@@ -272,9 +267,23 @@ void longLight()
     _delay_ms(400);
 }
 
+int getRandomInRange(int min, int max) 
+{
+    return min + rand() % (max - min + 1);
+}
+
 void lightdance()
 {
-
+    lightUpAllLeds();
+    while (1) 
+    {
+        int ledToToggle = getRandomInRange(0, 4 - 1);
+        lightUpLed(ledToToggle);
+        _delay_ms(50);
+        ledToToggle = getRandomInRange(0, 4 - 1);
+        lightDownLed(ledToToggle);
+        _delay_ms(50);
+    }
 }
 
 void executeLightMethod(char check)

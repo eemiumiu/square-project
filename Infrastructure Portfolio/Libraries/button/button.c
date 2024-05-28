@@ -3,7 +3,7 @@
 
 #define NUMBER_OF_BUTTONS 3
 
-#define DEBUG
+// #define DEBUG
 
 void enableButton( int button )
 {
