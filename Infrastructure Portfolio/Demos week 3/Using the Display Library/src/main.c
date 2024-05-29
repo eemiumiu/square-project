@@ -9,14 +9,14 @@ int main()
     initDisplay();
     while ( 1 )
     {
-        for ( int i = 0; i < 4; i++ )
-        {
-            writeNumberToSegment( i, 8 );
-            _delay_ms( 1000 );
-        }
-        /* Use the writeNumber function if
-         * you want to display a 4 digit number. */
-        writeNumber( 3333 );
+        // for ( int i = 0; i < 4; i++ )
+        // {
+        //     writeNumberToSegment( i, 6 );
+        //     _delay_ms( 1000 );
+        // }
+        // /* Use the writeNumber function if
+        //  * you want to display a 4 digit number. */
+        writeNumber( 3 );
         _delay_ms( 1000 );
         /* Problem: this function shows the digits 1 by 1 and then
          * adds a delay. So, only the last digit is displayed. 
@@ -27,7 +27,7 @@ int main()
         }
         /* Or you could use a function from the library.
          * Then you can also specify the display duration. */
-        writeNumberAndWait( 3333, 10000 );
+        // writeNumberAndWait( 3333, 10000 );
     }
     return 0;
 }
