@@ -55,6 +55,7 @@ int buttonReleased( int button )
 void enableButtonInterrupt(int button)
 {
     if ( button < 1 || button > NUMBER_OF_BUTTONS ) return;
+    
     PCICR |= _BV( PCIE1);
 
     PCMSK1 |= _BV( PC1  + (button - 1) );

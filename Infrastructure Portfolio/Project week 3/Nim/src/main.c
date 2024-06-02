@@ -1,5 +1,5 @@
-#include <avr/io.h> // ATmega328 pins, def of the registers (DDRB, PORTB, ...)
-#include <usart.h>  // for Serial Monitor
+#include <avr/io.h>
+#include <usart.h>
 #include <stdio.h>
 #include <util/delay.h>
 #include <avr/interrupt.h>
@@ -9,7 +9,12 @@
 
 #include <stdbool.h>
 
+// ISR(PCINT1_vect)
+// {
+
+// }
+
 int main()
 {
-
+    initUSART();
 }

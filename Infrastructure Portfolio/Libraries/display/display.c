@@ -1,7 +1,22 @@
 #include "display.h"
-
 #include <avr/io.h>
 #include <util/delay.h>
+
+// Added by me for Square Project (also line 132):
+// 
+/* Byte maps for the square states and arrows */
+const uint8_t SQUARE_STATE[] = {0xF7, 0xA3, 0x9C}; 
+// {down, norm, jump}
+const uint8_t ARROWS[] = {0xF7, 0xBF, 0xFE} ;
+// {down, middle, up}
+const uint8_t LIFE_STATE[] = {0x7F, 0x80}; 
+// {on, off}
+// state = state & life_value[0] - turn on life LED
+// state = state | life_value[1] - turn off life LED
+
+
+
+
 
 /* Segment byte maps for numbers 0 to 9 */
 const uint8_t SEGMENT_MAP[] = {0xC0, 0xF9, 0xA4, 0xB0, 0x99,
@@ -49,7 +64,9 @@ void writeNumberToSegment(uint8_t segment, uint8_t value) {
 
 //Writes a nuber between 0 and 9999 to the display. To be used in a loop...
 void writeNumber(int number) {
+
   if (number < 0 || number > 9999) return;
+
   writeNumberToSegment(0, number / 1000);
   writeNumberToSegment(1, (number / 100) % 10);
   writeNumberToSegment(2, (number / 10) % 10);
@@ -59,7 +76,9 @@ void writeNumber(int number) {
 //Writes a number between 0 and 9999 to the display and makes sure that it stays there a certain number of millisecs.
 //Note: the timing is approximate; the amount of time writeNumberToSegment takes is not accounted for...
 void writeNumberAndWait(int number, int delay) {
+
   if (number < 0 || number > 9999) return;
+
   for (int i = 0; i < delay / 20; i++) {
     writeNumberToSegment(0, number / 1000);
     _delay_ms(5);
@@ -70,4 +89,44 @@ void writeNumberAndWait(int number, int delay) {
     writeNumberToSegment(3, number % 10);
     _delay_ms(5);
   }
+
 }
+
+// Added from exercises:
+
+//Blank segment
+//Blanks a certain segment. Segment 0 is the leftmost.
+void blankSegment(uint8_t segment)
+{
+  cbi(PORTD, LATCH_DIO);
+
+  shift(0xFF, MSBFIRST);
+
+  shift(SEGMENT_SELECT[segment], MSBFIRST);
+
+  sbi(PORTD, LATCH_DIO);
+}
+
+//Alphabet on Display
+/* Byte maps of 26 letters */
+const uint8_t ALPHABET_MAP[] = {0x88, 0x83, 0xC6, 0xA1, 0x86, 0x8E, 0xC2,
+                                0x89, 0xCF, 0xE1, 0x8A, 0xC7, 0xEA, 0xC8,
+                                0xC0, 0x8C, 0x4A, 0xCC, 0x92, 0x87, 0xC1,
+                                0xC1, 0xD5, 0x89, 0x91, 0xA4};
+
+void writeCharToSegment(uint8_t segment, char character)
+{
+
+}
+
+void writeString(char* str)
+{
+
+}
+
+void writeStringAndWait(char* str, int delay)
+{
+
+}
+
+// Added methods by me for Square Project:
