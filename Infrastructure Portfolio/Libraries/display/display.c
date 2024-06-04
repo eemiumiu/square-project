@@ -2,9 +2,13 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
-// Added by me for Square Project (also line 132):
+// Added by me for Square Project (also line 143):
 // 
 /* Byte maps for the square states and arrows */
+
+const uint8_t SQUARE_AND_ARROWS_STATE[] = {0xF7, 0xA3, 0x9C,  0xBF, 0xFE,  0xFF};
+// {down, norm, jump} + {middle, up}
+
 const uint8_t SQUARE_STATE[] = {0xF7, 0xA3, 0x9C}; 
 // {down, norm, jump}
 const uint8_t ARROWS[] = {0xF7, 0xBF, 0xFE} ;
@@ -18,12 +22,12 @@ const uint8_t LIFE_STATE[] = {0x7F, 0x80};
 
 
 
+/* Byte maps to select digit 1 to 4 */
+const uint8_t SEGMENT_SELECT[] = {0xF1, 0xF2, 0xF4, 0xF8};
+
 /* Segment byte maps for numbers 0 to 9 */
 const uint8_t SEGMENT_MAP[] = {0xC0, 0xF9, 0xA4, 0xB0, 0x99,
                                0x92, 0x82, 0xF8, 0X80, 0X90};
-
-/* Byte maps to select digit 1 to 4 */
-const uint8_t SEGMENT_SELECT[] = {0xF1, 0xF2, 0xF4, 0xF8};
 
 void initDisplay() {
   sbi(DDRD, LATCH_DIO);
@@ -33,29 +37,32 @@ void initDisplay() {
 
 // loop through seven segments of LED display and shift the correct bits in the
 // data register
-void shift(uint8_t val, uint8_t bitorder) {
+void shift(uint8_t val, uint8_t bitorder) 
+{
   uint8_t bit;
 
-  for (uint8_t i = 0; i < NUMBER_OF_SEGMENTS; i++) {
-    if (bitorder == LSBFIRST) {
-      bit = !!(val & (1 << i));
-    } else {
-      bit = !!(val & (1 << (7 - i)));
-    }
-    // write bit to register
-    if (bit == HIGH)
-      sbi(PORTB, DATA_DIO);
-    else
-      cbi(PORTB, DATA_DIO);
+    for (uint8_t i = 0; i < NUMBER_OF_SEGMENTS; i++) 
+    {
+        if (bitorder == LSBFIRST) {
+            bit = !!(val & (1 << i));
+        } else {
+            bit = !!(val & (1 << (7 - i)));
+        }
+        // write bit to register
+        if (bit == HIGH)
+        sbi(PORTB, DATA_DIO);
+        else
+        cbi(PORTB, DATA_DIO);
 
-    // Trigger the clock pin so the display updates
-    sbi(PORTD, CLK_DIO);
-    cbi(PORTD, CLK_DIO);
-  }
+        // Trigger the clock pin so the display updates
+        sbi(PORTD, CLK_DIO);
+        cbi(PORTD, CLK_DIO);
+    }
 }
 
 //Writes a digit to a certain segment. Segment 0 is the leftmost.
-void writeNumberToSegment(uint8_t segment, uint8_t value) {
+void writeNumberToSegment(uint8_t segment, uint8_t value) 
+{
   cbi(PORTD, LATCH_DIO);
   shift(SEGMENT_MAP[value], MSBFIRST);
   shift(SEGMENT_SELECT[segment], MSBFIRST);
@@ -63,8 +70,8 @@ void writeNumberToSegment(uint8_t segment, uint8_t value) {
 }
 
 //Writes a nuber between 0 and 9999 to the display. To be used in a loop...
-void writeNumber(int number) {
-
+void writeNumber(int number) 
+{
   if (number < 0 || number > 9999) return;
 
   writeNumberToSegment(0, number / 1000);
@@ -129,4 +136,32 @@ void writeStringAndWait(char* str, int delay)
 
 }
 
+
+
+
+
 // Added methods by me for Square Project:
+
+// 5 states [from 0 to 4]
+void displayObjectToSegment(uint8_t segment, uint8_t value /* , int lives */) {
+    
+    // if lives > 0, value -> life_value method
+
+    cbi(PORTD, LATCH_DIO);
+    shift(SQUARE_AND_ARROWS_STATE[value], MSBFIRST);
+    shift(SEGMENT_SELECT[segment], MSBFIRST);
+    sbi(PORTD, LATCH_DIO);
+}
+
+void displayObject(int state /* , int lives */) 
+{
+     if (state < 0 || state > 9999) return;
+
+    // for(), send lives, then lives--; 
+    displayObjectToSegment(0, state / 1000);
+    displayObjectToSegment(1, (state / 100) % 10);
+    displayObjectToSegment(2, (state / 10) % 10);
+    displayObjectToSegment(3, state % 10);
+}
+
+

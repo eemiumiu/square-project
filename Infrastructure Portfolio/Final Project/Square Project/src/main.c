@@ -47,4 +47,12 @@ int main()
 {
     initUSART();
     initDisplay();
+
+    while(1)
+    {
+        for ( int i = 0; i < 10000; i ++ )
+        {
+            displayObject(2553);
+        }
+    }
 }

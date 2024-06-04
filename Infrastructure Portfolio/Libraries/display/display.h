@@ -19,8 +19,12 @@ void writeNumberToSegment(uint8_t segment, uint8_t value);
 void writeNumber(int number);
 void writeNumberAndWait(int number, int delay);
 
-// Added
+// Added from canvas exercises
 void blankSegment(uint8_t segment);
 void writeCharToSegment(uint8_t segment, char character);
 void writeString(char* str);
 void writeStringAndWait(char* str, int delay);
+
+// Added for my Square Project
+void displayObjectToSegment(uint8_t segment, uint8_t value /* , int lives */);
+void displayObject(int state /* , int lives */);
