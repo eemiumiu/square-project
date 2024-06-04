@@ -31,6 +31,7 @@ ISR(PCINT1_vect)
     // if button 1 is pressed
     if(bit_is_clear(PINC,PC1))
     {
+        printf("AAAAAAAAAAAAAAAAAAAAA");
         selected = 1;
         pressed = true;
     }

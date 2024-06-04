@@ -6,13 +6,9 @@
 // 
 /* Byte maps for the square states and arrows */
 
-const uint8_t SQUARE_AND_ARROWS_STATE[] = {0xF7, 0xA3, 0x9C,  0xBF, 0xFE,  0xFF};
-// {down, norm, jump} + {middle, up}
+const uint8_t SQUARE_AND_ARROWS_STATE[] = {0xFF,  0xF7, 0xA3, 0x9C,  0xBF, 0xFE};
+// {empty} + {down, norm, jump} + {middle, up}
 
-const uint8_t SQUARE_STATE[] = {0xF7, 0xA3, 0x9C}; 
-// {down, norm, jump}
-const uint8_t ARROWS[] = {0xF7, 0xBF, 0xFE} ;
-// {down, middle, up}
 const uint8_t LIFE_STATE[] = {0x7F, 0x80}; 
 // {on, off}
 // state = state & life_value[0] - turn on life LED
