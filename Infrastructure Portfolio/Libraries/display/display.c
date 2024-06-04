@@ -7,7 +7,7 @@
 /* Byte maps for the square states and arrows */
 
 const uint8_t SQUARE_AND_ARROWS_STATE[] = {0xFF,  0xF7, 0xA3, 0x9C,  0xBF, 0xFE};
-// {empty} + {down, norm, jump} + {middle, up}
+// {empty} + {down, norm, jump} + {middle, high}
 
 const uint8_t LIFE_STATE[] = {0x7F, 0x80}; 
 // {on, off}

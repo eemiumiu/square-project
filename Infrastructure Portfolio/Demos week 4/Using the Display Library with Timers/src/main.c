@@ -40,8 +40,8 @@ int main()
         }
         /* Use the writeNumber function if
          * you want to display a 4 digit number. */
-        writeNumber(1974);
-        _delay_ms(1000);
+//        writeNumber(1974);
+//        _delay_ms(1000);
         /* Problem: this function shows the digits 1 by 1 and then
          * adds a delay. So, only the last digit is displayed.
          * New Solution: use a timer/interrupt */

@@ -16,6 +16,22 @@
 
 /* Byte map for the square states and arrows - in the display.c */
 
+const int* empty = 0;
+const int* down = 1;
+const int* norm = 2;
+const int* up = 3;
+const int* middle = 4; 
+const int* high = 5;
+
+const int* digit_1 = 1000; 
+const int* digit_2 = 100; 
+const int* digit_3 = 10; 
+const int* digit_4 = 1; 
+
+uint32_t* counter = 0;
+
+bool game_play = true;
+
 typedef struct{
     int lives;
     int shields;
@@ -33,25 +49,34 @@ typedef struct{
     bool ground;
 } CUBE;
 
-CUBE* cube;
+CUBE** cube;
 
+void change_state(int digit, int state)
+{
+    (*cube) -> display = (*cube) -> display % digit + (digit * state);
+}
+
+void set_ground(bool b)
+{
+    (*cube) -> ground = b;
+}
 
 void jump()
-{
-    cube -> display = cube -> display % 1000 + (1000 * 3);
-    cube -> ground = false;
+{    
+    change_state(digit_1, up);
+    set_ground(false);
 }
 
 void back_down()
-{
-    cube -> display = cube -> display % 1000 + (1000 * 2);
-    cube -> ground = true;
+{    
+    change_state(digit_1, norm);
+    set_ground(true);
 }
 
 void duck()
-{
-    // return value*1000;
-
+{    
+    change_state(digit_1, down);
+    set_ground(true);
 }
 
 void random_arrow(int segment, int speed)
@@ -59,19 +84,26 @@ void random_arrow(int segment, int speed)
 
 }
 
+void initTimer()
+{
+    TCCR0A |= _BV( WGM00 ) | _BV( WGM01 );  
+    TCCR0B |= _BV( CS02 ) | _BV( CS00 );    
+    TIMSK0 |= _BV( TOIE0 ); 
+    TIMSK0 |= _BV( OCIE0A );
+
+    sei();
+}
+
 ISR(PCINT1_vect)
 {
     // left button
     if(bit_is_clear(PINC,PC1))
     {
-        printf("button 1 pressed\n");
-        if( cube -> ground )
+        if( (*cube) -> ground )
         {
+            set_ground(false);
             jump();
-            
-            // Use a timer instead of _delay_ms
-            _delay_ms(1000);
-            back_down();
+            counter = 0;
         }
     }
 
@@ -82,15 +114,45 @@ ISR(PCINT1_vect)
 
     if(bit_is_clear(PINC,PC3))
     {
-        
+        if( (*cube) -> ground )
+        {
+            set_ground(false);
+            duck();
+            counter = 0;
+        }
     }
+}
+
+// OCRA register
+ISR( TIMER0_COMPA_vect )
+{
+    // displayObject(cube -> display);
+    counter++;
+    if (counter > 2000) counter = 0;
+
+    if(counter > 500) 
+    {
+        back_down();
+        (*cube) -> ground = true;
+    }
+}
+
+// TOP value (255)
+ISR(TIMER0_OVF_vect)
+{
+    displayObject((*cube) -> display);
+    blankSegment(3); // so segment 4 is not brighter
+    counter++;
 }
 
 int main()
 {
     initUSART();
     initDisplay();
+
     enableAllButtonInterrupts();
+
+    initTimer();
 
     srand(0); // potentiometer
 
@@ -99,15 +161,14 @@ int main()
 
     cube =              (CUBE*)malloc(sizeof(CUBE));
 
-    cube -> display = 2000;
+    (*cube) -> display = 2000;
+    (*cube) -> ground = true;
     
-    // alloc_external_var(); maybe idk
-
-    sei();
-
-    while(1)
+    while(game_play)
     {
-        displayObject(cube -> display);
+        int hi;
+        // OCR0A = 001;
+        // if (counter > 2000) counter = 0;
     }
     
     free(cube);
