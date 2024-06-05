@@ -6,13 +6,14 @@
 // 
 /* Byte maps for the square states and arrows */
 
-const uint8_t SQUARE_AND_ARROWS_STATE[] = {0xFF,  0xF7, 0xA3, 0x9C,  0xBF, 0xFE};
+const uint8_t SQUARE_AND_ARROWS_STATE[] = {0xFF,  0xF7, 0xA3, 0x9C,  0xBF, 0xFE,  0x00};
 // {empty} + {down, norm, jump} + {middle, high}
 
 const uint8_t LIFE_STATE[] = {0x7F, 0x80}; 
 // {on, off}
 // state = state & life_value[0] - turn on life LED
 // state = state | life_value[1] - turn off life LED
+// do the same for arrows when they reach 1st digit
 
 
 
