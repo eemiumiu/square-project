@@ -22,27 +22,22 @@
 #define DIGIT_3 10
 #define DIGIT_4 1
 
-uint32_t counter1 = 0; // memory?
+const int empty = 0;
+const int low = 1;
+const int norm = 2;
+const int up = 3;
 
-int* counter_reset = 2000;
-int* down_time_cube = 70;
+uint32_t counter1 = 0; 
 
-int* generate_arrow = 1000;
-int* speed = 150;
+bool game_play = true; 
 
-bool lock = false;
-bool pass1 = false;
-bool pass2 = false;
-bool pass3 = false;
-
-bool game_play = true; // memory?
-
-const int* empty = 0;
-const int* low = 1;
-const int* norm = 2;
-const int* up = 3;
-const int* middle = 4; 
-const int* high = 5;
+typedef struct{
+    int* pos[3];
+    int digit; 
+    //
+    int generate_arrow;
+    int speed;
+} ARROW;
 
 typedef struct{
     int lives;
@@ -50,53 +45,74 @@ typedef struct{
     int score;
 } PLAYER;
 
-typedef struct{
+typedef struct {
     int display;
     bool ground;
     int state;
+    //
+    int counter_reset;
+    int down_time_cube;
 } CUBE;
 
 CUBE* cube;
 
-void change_didit_cube(int digit, int state){
-    cube -> display = cube -> display % digit + (digit * state);
-}
+    void change_didit_cube(int digit, int state){
+        cube -> display = cube -> display % digit + (digit * state);
+    }
 
-void setGround(bool b){
-    cube -> ground = b;
-}
+    void setGround(bool b){
+        cube -> ground = b;
+    }
 
-bool isCubeOnTheGround(){
-    return cube -> ground;
-}
+    bool isCubeOnTheGround(){
+        return cube -> ground;
+    }
 
-change_digit_arrow(int digit, int state){
-    //height 3
-    //speed = every 250 of counter2
-    //2000 = (2000 / 1)*1 + 1*5 
-    //2005 = (2005 / 10)*10 + 10*5 
-    //2050 = (2050 / 100)*100 + 100*5 
-    //special 7000, other
+    void change_digit_arrow(int digit, int state, ARROW **arrow)
+    {
+        (cube -> display) = 
+        (cube -> display / digit)*digit + (digit * state);
 
-    (cube -> display) = 
-    (cube -> display / digit)*digit + (digit * state);
-}
+        if(digit == DIGIT_1)
+        {
+            // printf("%d \n", (*arrow) -> pos[(*arrow) -> digit]);
+            if(isCubeOnTheGround() && (*arrow) -> pos[(*arrow) -> digit] == 5) specialCase(1);
+            if((cube -> display) / 1000 == 3 && (*arrow) -> pos[(*arrow) -> digit] ==1 ) specialCase(2);
+            if((cube -> display) / 1000 == 1 && (*arrow) -> pos[(*arrow) -> digit] ==5 ) specialCase(3);
+            if((cube -> display) / 1000 == 1 && (*arrow) -> pos[(*arrow) -> digit] ==4 ) specialCase(4);
+            _delay_ms((*arrow) -> speed);
+            specialCase(0);
+        }
+    }
 
-void jump()
-{    
-    change_didit_cube(DIGIT_1, up);
-}
+    void jump()
+    {    
+        change_didit_cube(DIGIT_1, up);
+    }
 
-void back_down()
-{    
-    change_didit_cube(DIGIT_1, norm);
-    setGround(true);
-}
+    void back_down()
+    {    
+        change_didit_cube(DIGIT_1, norm);
+        setGround(true);
+    }
 
-void duck()
-{    
-    change_didit_cube(DIGIT_1, low);
-}
+    void duck()
+    {    
+        change_didit_cube(DIGIT_1, low);
+    }
+
+    void getRandomArrow(ARROW *arrow)
+    {
+        arrow -> digit = rand() % 3;
+
+        change_digit_arrow(DIGIT_4, arrow -> pos[arrow -> digit], &arrow);
+        _delay_ms(arrow -> speed);
+        change_digit_arrow(DIGIT_3, arrow -> pos[arrow -> digit], &arrow);
+        _delay_ms(arrow -> speed);
+        change_digit_arrow(DIGIT_2, arrow -> pos[arrow -> digit], &arrow);
+        _delay_ms(arrow -> speed);
+        change_digit_arrow(DIGIT_1, empty, &arrow);
+    }
 
 void initTimer()
 {
@@ -112,22 +128,14 @@ ISR(TIMER0_OVF_vect)
     blankSegment(3); // so last segment is not brighter
 
     counter1++; 
-    if (counter1 > counter_reset){
+    if (counter1 > cube -> counter_reset){
         counter1 = 0;
     } 
 
-    if (counter1 > down_time_cube) {
+    if (counter1 > cube -> down_time_cube) {
         back_down();
         setGround(true);
     }
-
-    if (counter1 / 1000 == 1 && !lock)
-    {
-        lock = true;
-
-    }
-
-    printf("%d \n", counter1);
 }
 
 ISR(PCINT1_vect)
@@ -161,6 +169,8 @@ ISR(PCINT1_vect)
 int main()
 {
     PLAYER* player =    (PLAYER*)malloc(sizeof(PLAYER));
+    ARROW* arrow =      (ARROW*)malloc(sizeof(ARROW));
+    *arrow =            (ARROW) {{1, 4, 5}, 0};
     cube =              (CUBE*)malloc(sizeof(CUBE));
 
     initUSART();
@@ -175,35 +185,30 @@ int main()
 
     cube -> display = 2000;
     cube -> ground = true;
+    cube -> counter_reset = 2000;
+    cube -> down_time_cube = 70;
     
     player -> lives = 4;
+    player -> shields = 4;
+    player -> score = 0;
 
-    change_digit_arrow(DIGIT_4, low);
+    arrow -> generate_arrow = 800;
+    arrow -> speed = 400;
+
     _delay_ms(1000);
-    change_digit_arrow(DIGIT_3, low);
-    _delay_ms(1000);
-    change_digit_arrow(DIGIT_2, low);
-    _delay_ms(1000);
 
-    // cube -> display = 6666;
-    // _delay_ms(1000);
-    // cube -> display = 1000;
+    while(game_play)
+    {
+        _delay_ms(arrow -> generate_arrow);
+        getRandomArrow(arrow);
+
+        printf("Score: %d \n");
     
-    // while(game_play)
-    // {
-        // while(!lock);
-        // change_digit_arrow(DIGIT_4, high); 
-
-        // change_digit_arrow(DIGIT_3, high); 
-
-        // change_digit_arrow(DIGIT_2, high); 
-
-        // change_digit_arrow(DIGIT_1, high); 
+    };
     
-    // };
-    
-    free(cube);
     free(player);
+    free(arrow);
+    free(cube);
 
     return 0;
 }

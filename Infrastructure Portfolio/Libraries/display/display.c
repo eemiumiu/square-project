@@ -2,18 +2,17 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
-// Added by me for Square Project (also line 143):
-// 
-/* Byte maps for the square states and arrows */
+// Added by me for Square Project (also line 140):
 
-const uint8_t SQUARE_AND_ARROWS_STATE[] = {0xFF,  0xF7, 0xA3, 0x9C,  0xBF, 0xFE,  0x00};
-// {empty} + {down, norm, jump} + {middle, high}
+#define INCR_BRIGHT /* For brighter display */
+
+const uint8_t SQUARE_AND_ARROWS_STATE[] = {0xFF, 0xF7,0xA3,0x9C, 0xBF,0xFE, 0xA2,0x94,0xF6,0xB7};
+// {empty} + {down, norm, jump} + {middle, high} + special_cases
 
 const uint8_t LIFE_STATE[] = {0x7F, 0x80}; 
-// {on, off}
+// {on, off} bitmasks:
 // state = state & life_value[0] - turn on life LED
 // state = state | life_value[1] - turn off life LED
-// do the same for arrows when they reach 1st digit
 
 
 
@@ -140,8 +139,8 @@ void writeStringAndWait(char* str, int delay)
 // Added methods by me for Square Project:
 
 // 5 states [from 0 to 4]
-void displayObjectToSegment(uint8_t segment, uint8_t value /* , int lives */) {
-    
+void displayObjectToSegment(uint8_t segment, uint8_t value /* , int lives */) 
+{    
     // if lives > 0, value -> life_value method
 
     cbi(PORTD, LATCH_DIO);
@@ -150,15 +149,41 @@ void displayObjectToSegment(uint8_t segment, uint8_t value /* , int lives */) {
     sbi(PORTD, LATCH_DIO);
 }
 
+int arrow_case = 0;
+
+void specialCase(int value)
+{
+    arrow_case = value;
+}
+
 void displayObject(int state /* , int lives */) 
 {
-     if (state < 0 || state > 9999) return;
+    if (state < 0 || state > 9999) return;
 
     // for(), send lives, then lives--; 
-    displayObjectToSegment(0, state / 1000);
+    switch(arrow_case)
+    {
+        case(0): displayObjectToSegment(0, state / 1000); break;
+        case(1): displayObjectToSegment(0, 6); break;
+        case(2): displayObjectToSegment(0, 7); break;
+        case(3): displayObjectToSegment(0, 8); break;
+        case(4): displayObjectToSegment(0, 9); break;
+    }
+    #ifdef INCR_BRIGHT
+    _delay_ms(1);
+    #endif INCR_BRIGHT
     displayObjectToSegment(1, (state / 100) % 10);
+    #ifdef INCR_BRIGHT
+    _delay_ms(1);
+    #endif INCR_BRIGHT
     displayObjectToSegment(2, (state / 10) % 10);
+    #ifdef INCR_BRIGHT
+    _delay_ms(1);
+    #endif INCR_BRIGHT
     displayObjectToSegment(3, state % 10);
+    #ifdef INCR_BRIGHT
+    _delay_ms(1);
+    #endif INCR_BRIGHT
 }
 
 
