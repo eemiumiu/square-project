@@ -17,6 +17,8 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+// #define DEBUG
+
 #define DIGIT_1 1000
 #define DIGIT_2 100
 #define DIGIT_3 10
@@ -35,7 +37,7 @@ typedef struct{
     int* pos[3];
     int digit; 
     //
-    int generate_arrow;
+    int generate_time;
     int speed;
 } ARROW;
 
@@ -48,7 +50,6 @@ typedef struct{
 typedef struct {
     int display;
     bool ground;
-    int state;
     //
     int counter_reset;
     int down_time_cube;
@@ -68,19 +69,38 @@ CUBE* cube;
         return cube -> ground;
     }
 
-    void change_digit_arrow(int digit, int state, ARROW **arrow)
+    void update_state(int digit, int state, ARROW **arrow, PLAYER **player)
     {
         (cube -> display) = 
         (cube -> display / digit)*digit + (digit * state);
 
         if(digit == DIGIT_1)
         {
-            // printf("%d \n", (*arrow) -> pos[(*arrow) -> digit]);
+            #ifdef DEBUG
+            printf("Display: %d \n", cube -> display);
+            printf("Arrow: %d \n", (*arrow) -> pos[(*arrow) -> digit]);
+            #endif
+
+            if(
+                (cube -> display / 1000 == 1 && (*arrow) -> pos[(*arrow) -> digit] ==1 )
+                ||
+                (cube -> display / 1000 == 2 && ((*arrow) -> pos[(*arrow) -> digit] ==1 || (*arrow) -> pos[(*arrow) -> digit] ==4))
+                ||
+                (cube -> display / 1000 == 3 && ((*arrow) -> pos[(*arrow) -> digit] ==4 || (*arrow) -> pos[(*arrow) -> digit] ==5))
+            ) {
+                (*player) -> lives --;
+                // printf("Dead !\n");
+            } else {
+                (*player) -> score ++; 
+                // printf("Good job !\n");
+            }
+
             if(isCubeOnTheGround() && (*arrow) -> pos[(*arrow) -> digit] == 5) specialCase(1);
             if((cube -> display) / 1000 == 3 && (*arrow) -> pos[(*arrow) -> digit] ==1 ) specialCase(2);
             if((cube -> display) / 1000 == 1 && (*arrow) -> pos[(*arrow) -> digit] ==5 ) specialCase(3);
             if((cube -> display) / 1000 == 1 && (*arrow) -> pos[(*arrow) -> digit] ==4 ) specialCase(4);
             _delay_ms((*arrow) -> speed);
+
             specialCase(0);
         }
     }
@@ -101,17 +121,18 @@ CUBE* cube;
         change_didit_cube(DIGIT_1, low);
     }
 
-    void getRandomArrow(ARROW *arrow)
+    void generate_arrow(ARROW *arrow, PLAYER *player)
     {
         arrow -> digit = rand() % 3;
 
-        change_digit_arrow(DIGIT_4, arrow -> pos[arrow -> digit], &arrow);
+        update_state(DIGIT_4, arrow -> pos[arrow -> digit], &arrow, &player);
         _delay_ms(arrow -> speed);
-        change_digit_arrow(DIGIT_3, arrow -> pos[arrow -> digit], &arrow);
+        update_state(DIGIT_3, arrow -> pos[arrow -> digit], &arrow, &player);
         _delay_ms(arrow -> speed);
-        change_digit_arrow(DIGIT_2, arrow -> pos[arrow -> digit], &arrow);
+        update_state(DIGIT_2, arrow -> pos[arrow -> digit], &arrow, &player);
         _delay_ms(arrow -> speed);
-        change_digit_arrow(DIGIT_1, empty, &arrow);
+        
+        update_state(DIGIT_1, empty, &arrow, &player);
     }
 
 void initTimer()
@@ -121,7 +142,6 @@ void initTimer()
     TIMSK0 |= _BV( TOIE0 ); 
 }
 
-// TOP value (255)
 ISR(TIMER0_OVF_vect)
 {
     displayObject(cube -> display);
@@ -170,7 +190,6 @@ int main()
 {
     PLAYER* player =    (PLAYER*)malloc(sizeof(PLAYER));
     ARROW* arrow =      (ARROW*)malloc(sizeof(ARROW));
-    *arrow =            (ARROW) {{1, 4, 5}, 0};
     cube =              (CUBE*)malloc(sizeof(CUBE));
 
     initUSART();
@@ -185,24 +204,29 @@ int main()
 
     cube -> display = 2000;
     cube -> ground = true;
-    cube -> counter_reset = 2000;
+    cube -> counter_reset = 3000;
     cube -> down_time_cube = 70;
     
     player -> lives = 4;
     player -> shields = 4;
     player -> score = 0;
 
-    arrow -> generate_arrow = 800;
+    *arrow = (ARROW) {{1, 4, 5}, 0};
+    arrow -> generate_time = 800;
     arrow -> speed = 400;
 
     _delay_ms(1000);
 
     while(game_play)
     {
-        _delay_ms(arrow -> generate_arrow);
-        getRandomArrow(arrow);
+        _delay_ms(arrow -> generate_time);
+        generate_arrow(arrow, player);
 
-        printf("Score: %d \n");
+        printf("Score: %d \n", player -> score);
+        printf("Score: %d \n", player -> lives);
+
+        // randomSpeed()
+        // 
     
     };
     
