@@ -2,17 +2,16 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
-// Added by me for Square Project (also line 140):
+// Added by me for Square Project (also from line 140):
 
 #define INCR_BRIGHT /* For brighter display */
 
 const uint8_t SQUARE_AND_ARROWS_STATE[] = {0xFF, 0xF7,0xA3,0x9C, 0xBF,0xFE, 0xA2,0x94,0xF6,0xB7};
 // {empty} + {down, norm, jump} + {middle, high} + special_cases
 
-const uint8_t LIFE_STATE[] = {0x7F, 0x80}; 
-// {on, off} bitmasks:
-// state = state & life_value[0] - turn on life LED
-// state = state | life_value[1] - turn off life LED
+const uint8_t LIFE_STATE = 0x7F; 
+// state = state & LIFE_STATE - turn on life LED
+
 
 
 
@@ -138,13 +137,22 @@ void writeStringAndWait(char* str, int delay)
 
 // Added methods by me for Square Project:
 
-// 5 states [from 0 to 4]
-void displayObjectToSegment(uint8_t segment, uint8_t value /* , int lives */) 
-{    
-    // if lives > 0, value -> life_value method
+int lives_case = 4;
 
+void displayLives(int* value)
+{
+    lives_case = value;
+}
+
+void displayObjectToSegment(uint8_t segment, uint8_t value) 
+{    
     cbi(PORTD, LATCH_DIO);
+
+    if(segment < lives_case) 
+    shift(SQUARE_AND_ARROWS_STATE[value] & LIFE_STATE, MSBFIRST);
+    else
     shift(SQUARE_AND_ARROWS_STATE[value], MSBFIRST);
+
     shift(SEGMENT_SELECT[segment], MSBFIRST);
     sbi(PORTD, LATCH_DIO);
 }
@@ -156,11 +164,10 @@ void specialCase(int value)
     arrow_case = value;
 }
 
-void displayObject(int state /* , int lives */) 
+void displayObject(int state) 
 {
     if (state < 0 || state > 9999) return;
 
-    // for(), send lives, then lives--; 
     switch(arrow_case)
     {
         case(0): displayObjectToSegment(0, state / 1000); break;
@@ -185,5 +192,3 @@ void displayObject(int state /* , int lives */)
     _delay_ms(1);
     #endif INCR_BRIGHT
 }
-
-

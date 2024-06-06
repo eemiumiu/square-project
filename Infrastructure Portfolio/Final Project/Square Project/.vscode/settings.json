@@ -7,6 +7,8 @@
         "display.h": "c",
         "buzzer.h": "c",
         "usart.h": "c",
-        "stdbool.h": "c"
+        "stdbool.h": "c",
+        "math.h": "c",
+        "string.h": "c"
     }
 }

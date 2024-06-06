@@ -6,9 +6,9 @@
 #include <led.h>
 #include <button.h>
 #include <buzzer.h>
-#include <display.h>    /* added methods for my game as well, like 
-                        *  displayObjectToSegment, displayObject, 
-                        *  and the arrays: SQUARE_AND_ARROWS_STATE[], 
+#include <display.h>    /* contains methods I created as well, like 
+                        *  displayObjectToSegment(), displayObject(), 
+                        *  and the byte_maps: SQUARE_AND_ARROWS_STATE[], 
                         *  LIFE_STATE[] */ 
 
 #include <string.h>
@@ -81,7 +81,7 @@ CUBE* cube;
             printf("Arrow: %d \n", (*arrow) -> pos[(*arrow) -> digit]);
             #endif
 
-            if(
+            if (
                 (cube -> display / 1000 == 1 && (*arrow) -> pos[(*arrow) -> digit] ==1 )
                 ||
                 (cube -> display / 1000 == 2 && ((*arrow) -> pos[(*arrow) -> digit] ==1 || (*arrow) -> pos[(*arrow) -> digit] ==4))
@@ -211,7 +211,7 @@ int main()
     player -> shields = 4;
     player -> score = 0;
 
-    *arrow = (ARROW) {{1, 4, 5}, 0};
+    *arrow = (ARROW){{1, 4, 5}, 0};
     arrow -> generate_time = 800;
     arrow -> speed = 400;
 
@@ -223,11 +223,19 @@ int main()
         generate_arrow(arrow, player);
 
         printf("Score: %d \n", player -> score);
-        printf("Score: %d \n", player -> lives);
+        printf("Lives: %d \n", player -> lives);
+
+        displayLives(player -> lives);
 
         // randomSpeed()
-        // 
-    
+        //
+
+        if(player -> lives == 0)
+        {
+            printf("END GAME, YOU LOST HAHAHA");
+            game_play = false;
+        }
+         
     };
     
     free(player);
