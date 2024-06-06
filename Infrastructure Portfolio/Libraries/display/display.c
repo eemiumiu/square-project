@@ -109,27 +109,11 @@ void blankSegment(uint8_t segment)
   sbi(PORTD, LATCH_DIO);
 }
 
-//Alphabet on Display
 /* Byte maps of 26 letters */
 const uint8_t ALPHABET_MAP[] = {0x88, 0x83, 0xC6, 0xA1, 0x86, 0x8E, 0xC2,
                                 0x89, 0xCF, 0xE1, 0x8A, 0xC7, 0xEA, 0xC8,
                                 0xC0, 0x8C, 0x4A, 0xCC, 0x92, 0x87, 0xC1,
                                 0xC1, 0xD5, 0x89, 0x91, 0xA4};
-
-void writeCharToSegment(uint8_t segment, char character)
-{
-
-}
-
-void writeString(char* str)
-{
-
-}
-
-void writeStringAndWait(char* str, int delay)
-{
-
-}
 
 
 

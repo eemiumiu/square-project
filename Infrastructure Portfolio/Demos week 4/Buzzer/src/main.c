@@ -12,7 +12,7 @@
 #define E5 659.250
 #define F5 698.460
 #define G5 783.990
-#define A5 880.00
+#define A5 880.000
 #define B5 987.770
 #define C6 1046.500
 

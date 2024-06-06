@@ -33,6 +33,12 @@ uint16_t counter1 = 0;
 uint16_t potentiometer_seed = 0;
 
 bool game_play = true; 
+bool opening_tune = true;
+bool ending_tune = false;
+bool hit1 = true;
+bool hit2 = true;
+bool hit3 = true;
+bool hit4 = true;
 
 int lives = 4;
 int shields = 4;
@@ -91,7 +97,7 @@ CUBE* cube;
                 ||
                 (cube -> display / 1000 == 3 && ((*arrow) -> pos[(*arrow) -> digit] ==4 || (*arrow) -> pos[(*arrow) -> digit] ==5))
             ) {
-                lives --;
+                lives --; 
                 // printf("Dead !\n");
             } else {
                 (*player) -> score ++; 
@@ -183,6 +189,8 @@ ISR(TIMER0_OVF_vect)
     ADCSRA |= ( 1 << ADSC );  
     loop_until_bit_is_clear( ADCSRA, ADSC );    
     potentiometer_seed = ADC; ADCSRA |= ( 1 << ADPS2 ) | ( 1 << ADPS1 ) | ( 1 << ADPS0 );
+
+    gameSoundtrack();
 }
 
 ISR(PCINT1_vect)
@@ -224,6 +232,7 @@ int main()
     initADC();
     initDisplay();
     initTimer();
+    enableBuzzer();
 
     enableAllButtonInterrupts();
     enableAllLeds();
@@ -266,6 +275,7 @@ int main()
 
         if(lives == 0)
         {
+            ending_tune = true;
             printf("\n END GAME \n\n Score obtained: %d \n Shields used:   %d \n ", player -> score, used_shields);
             game_play = false;
         }
@@ -277,4 +287,65 @@ int main()
     free(cube);
 
     return 0;
+}
+
+void gameSoundtrack()
+{
+        if(opening_tune)
+    {
+        for(int i=0; i<2; i++)
+        {
+            playTone( 987.770, 50 ); 
+            _delay_ms(50);
+            playTone( 1046.500, 50 ); 
+            _delay_ms(50);
+        }       
+        playTone( 1046.500, 100 );  
+        _delay_ms(100);
+        playTone( 987.770, 150 ); 
+        _delay_ms(100);
+        playTone( 783.990, 100 ); 
+        _delay_ms(100);
+        playTone( 987.770, 100 );
+        _delay_ms(100);
+        playTone( 1046.500, 100 );  
+
+        opening_tune = false;
+    }
+
+    if(lives<4 && hit1)
+    {
+        playTone( 987.770, 100 );
+        hit1 = false;
+    } 
+
+    if(lives<3 && hit2)
+    {
+        playTone( 987.770, 100 );
+        hit2 = false;
+    } 
+
+    if(lives<2 && hit3)
+    {
+        playTone( 987.770, 100 );
+        hit3 = false;
+    } 
+
+    if(lives<1 && hit4)
+    {
+        playTone( 987.770, 100 );
+        hit4 = false;
+    } 
+
+    if(ending_tune)
+    {
+        playTone( 783.990, 100 ); 
+        _delay_ms(200);
+        playTone( 987.770, 100 );
+        _delay_ms(200);
+        playTone( 1046.500, 100 ); 
+        _delay_ms(200);    
+
+        ending_tune = false;
+    }
 }
