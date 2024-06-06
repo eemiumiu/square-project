@@ -9,8 +9,8 @@
 const uint8_t SQUARE_AND_ARROWS_STATE[] = {0xFF, 0xF7,0xA3,0x9C, 0xBF,0xFE, 0xA2,0x94,0xF6,0xB7};
 // {empty} + {down, norm, jump} + {middle, high} + special_cases
 
-const uint8_t LIFE_STATE = 0x7F; 
-// state = state & LIFE_STATE - turn on life LED
+const uint8_t SHIELD_STATE = 0x7F; 
+// state = state & SHIELD_STATE - turn on shield LED
 
 
 
@@ -137,19 +137,19 @@ void writeStringAndWait(char* str, int delay)
 
 // Added methods by me for Square Project:
 
-int lives_case = 4;
+int shield_case = 4;
 
-void displayLives(int* value)
+void displayShields(int* value)
 {
-    lives_case = value;
+    shield_case = value;
 }
 
 void displayObjectToSegment(uint8_t segment, uint8_t value) 
 {    
     cbi(PORTD, LATCH_DIO);
 
-    if(segment < lives_case) 
-    shift(SQUARE_AND_ARROWS_STATE[value] & LIFE_STATE, MSBFIRST);
+    if(segment < shield_case) 
+    shift(SQUARE_AND_ARROWS_STATE[value] & SHIELD_STATE, MSBFIRST);
     else
     shift(SQUARE_AND_ARROWS_STATE[value], MSBFIRST);
 
@@ -169,7 +169,7 @@ void displayObject(int state)
     if (state < 0 || state > 9999) return;
 
     switch(arrow_case)
-    {
+    {   
         case(0): displayObjectToSegment(0, state / 1000); break;
         case(1): displayObjectToSegment(0, 6); break;
         case(2): displayObjectToSegment(0, 7); break;

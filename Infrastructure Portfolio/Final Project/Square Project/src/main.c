@@ -29,21 +29,24 @@ const int low = 1;
 const int norm = 2;
 const int up = 3;
 
-uint32_t counter1 = 0; 
+uint16_t counter1 = 0; 
+uint16_t potentiometer_seed = 0;
 
 bool game_play = true; 
+
+int lives = 4;
+int shields = 4;
+int used_shields = 0;
 
 typedef struct{
     int* pos[3];
     int digit; 
     //
-    int generate_time;
+    uint16_t generate_time;
     int speed;
 } ARROW;
 
 typedef struct{
-    int lives;
-    int shields;
     int score;
 } PLAYER;
 
@@ -88,7 +91,7 @@ CUBE* cube;
                 ||
                 (cube -> display / 1000 == 3 && ((*arrow) -> pos[(*arrow) -> digit] ==4 || (*arrow) -> pos[(*arrow) -> digit] ==5))
             ) {
-                (*player) -> lives --;
+                lives --;
                 // printf("Dead !\n");
             } else {
                 (*player) -> score ++; 
@@ -102,6 +105,7 @@ CUBE* cube;
             _delay_ms((*arrow) -> speed);
 
             specialCase(0);
+        // specialCase() - so arrow can be displayed on the same digit as the cube
         }
     }
 
@@ -135,6 +139,17 @@ CUBE* cube;
         update_state(DIGIT_1, empty, &arrow, &player);
     }
 
+void initADC()
+{
+    ADMUX |= ( 1 << REFS0 ) ;   //Set up of reference voltage. We choose 5V as reference.
+    ADMUX &= ~(1 << MUX3  ) & ~(1 << MUX2  ) & ~(1 << MUX1 ) & ~(1 << MUX0 );
+                                //Set MUX0-3 to zero to read analog input from PC0
+                                //Default is 0000 so this setting is not really necessary
+                                //Determine a sample rate by setting a division factor. 
+                                //Used division factor: 128
+    ADCSRA |= ( 1 << ADEN ); //Enable the ADC
+}
+
 void initTimer()
 {
     TCCR0A |= _BV( WGM00 ) | _BV( WGM01 );  
@@ -156,6 +171,18 @@ ISR(TIMER0_OVF_vect)
         back_down();
         setGround(true);
     }
+
+    switch(lives){
+    case 3: lightDownLed(3); break;
+    case 2: lightDownLed(2); break;
+    case 1: lightDownLed(1); break;
+    case 0: lightDownLed(0); break;
+    }
+
+    // Potentiometer seed
+    ADCSRA |= ( 1 << ADSC );  
+    loop_until_bit_is_clear( ADCSRA, ADSC );    
+    potentiometer_seed = ADC; ADCSRA |= ( 1 << ADPS2 ) | ( 1 << ADPS1 ) | ( 1 << ADPS0 );
 }
 
 ISR(PCINT1_vect)
@@ -172,7 +199,8 @@ ISR(PCINT1_vect)
 
     if(bit_is_clear(PINC,PC2))
     {
-        
+       shields--;
+       if(shields > 0) { lives++; used_shields++; displayShields(shields); }
     }
 
     if(bit_is_clear(PINC,PC3))
@@ -193,12 +221,12 @@ int main()
     cube =              (CUBE*)malloc(sizeof(CUBE));
 
     initUSART();
+    initADC();
     initDisplay();
     initTimer();
 
     enableAllButtonInterrupts();
-
-    srand(0); // potentiometer
+    enableAllLeds();
 
     sei(); 
 
@@ -207,32 +235,38 @@ int main()
     cube -> counter_reset = 3000;
     cube -> down_time_cube = 70;
     
-    player -> lives = 4;
-    player -> shields = 4;
     player -> score = 0;
 
     *arrow = (ARROW){{1, 4, 5}, 0};
-    arrow -> generate_time = 800;
-    arrow -> speed = 400;
+    arrow -> generate_time = 1200;
+    arrow -> speed = 350;
 
-    _delay_ms(1000);
+    _delay_ms(500);
+
+    printf("\n WELCOME TO SQUARE GAME \n");
+    printf(" Avoid incoming arrows by jumping and ducking !!!\n");
+    printf("\n RULES: \n");
+    printf(" 1. Press button 1 to jump \n");
+    printf(" 2. Press button 3 to duck \n");
+    printf(" 3. To activate a shield, press button 2 \n");
+
+    srand(potentiometer_seed); 
+    #ifdef DEBUG
+    printf("Potentiometer: %d \n", potentiometer_seed);
+    #endif
 
     while(game_play)
     {
+
         _delay_ms(arrow -> generate_time);
+
         generate_arrow(arrow, player);
 
-        printf("Score: %d \n", player -> score);
-        printf("Lives: %d \n", player -> lives);
+        displayShields(shields);
 
-        displayLives(player -> lives);
-
-        // randomSpeed()
-        //
-
-        if(player -> lives == 0)
+        if(lives == 0)
         {
-            printf("END GAME, YOU LOST HAHAHA");
+            printf("\n END GAME \n\n Score obtained: %d \n Shields used:   %d \n ", player -> score, used_shields);
             game_play = false;
         }
          

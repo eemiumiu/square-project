@@ -26,7 +26,7 @@ void writeString(char* str);
 void writeStringAndWait(char* str, int delay);
 
 // Added for my Square Project
-void displayLives(int* value);
+void displayShields(int* value);
 void specialCase(int value);
 void displayObjectToSegment(uint8_t segment, uint8_t value);
 void displayObject(int state );
