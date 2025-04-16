@@ -1,9 +1,0 @@
-{
-    "files.associations": {
-        "io.h": "c",
-        "button.h": "c",
-        "delay.h": "c",
-        "led.h": "c",
-        "stdbool.h": "c"
-    }
-}

@@ -1,0 +1,1 @@
+The path to these libraries is specified in the platformio.ini file inside the main project directory.
