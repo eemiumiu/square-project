@@ -143,67 +143,6 @@ void generate_arrow(ARROW *arrow, PLAYER *player)
     update_state(DIGIT_1, empty, &arrow, &player);
 }
 
-void gameSoundtrack()
-{
-    if(opening_tune)
-    {
-        for(int i=0; i<2; i++)
-        {
-            playTone( 987.770, 50 ); 
-            _delay_ms(50);
-            playTone( 1046.500, 50 ); 
-            _delay_ms(50);
-        }       
-        playTone( 1046.500, 100 );  
-        _delay_ms(100);
-        playTone( 987.770, 150 ); 
-        _delay_ms(100);
-        playTone( 783.990, 100 ); 
-        _delay_ms(100);
-        playTone( 987.770, 100 );
-        _delay_ms(100);
-        playTone( 1046.500, 100 );  
-
-        opening_tune = false;
-    }
-
-    if(lives<4 && hit1)
-    {
-        playTone( 987.770, 100 );
-        hit1 = false;
-    } 
-
-    if(lives<3 && hit2)
-    {
-        playTone( 987.770, 100 );
-        hit2 = false;
-    } 
-
-    if(lives<2 && hit3)
-    {
-        playTone( 987.770, 100 );
-        hit3 = false;
-    } 
-
-    if(lives<1 && hit4)
-    {
-        playTone( 987.770, 100 );
-        hit4 = false;
-    } 
-
-    if(ending_tune)
-    {
-        playTone( 783.990, 100 ); 
-        _delay_ms(200);
-        playTone( 987.770, 100 );
-        _delay_ms(200);
-        playTone( 1046.500, 100 ); 
-        _delay_ms(200);    
-
-        ending_tune = false;
-    }
-}
-
 void initADC()
 {
     ADMUX |= ( 1 << REFS0 ) ;   //Set up of reference voltage (5V as reference)
@@ -350,4 +289,65 @@ int main()
     free(cube);
 
     return 0;
+}
+
+void gameSoundtrack()
+{
+    if(opening_tune)
+    {
+        for(int i=0; i<2; i++)
+        {
+            playTone( 987.770, 50 ); 
+            _delay_ms(50);
+            playTone( 1046.500, 50 ); 
+            _delay_ms(50);
+        }       
+        playTone( 1046.500, 100 );  
+        _delay_ms(100);
+        playTone( 987.770, 150 ); 
+        _delay_ms(100);
+        playTone( 783.990, 100 ); 
+        _delay_ms(100);
+        playTone( 987.770, 100 );
+        _delay_ms(100);
+        playTone( 1046.500, 100 );  
+
+        opening_tune = false;
+    }
+
+    if(lives<4 && hit1)
+    {
+        playTone( 987.770, 100 );
+        hit1 = false;
+    } 
+
+    if(lives<3 && hit2)
+    {
+        playTone( 987.770, 100 );
+        hit2 = false;
+    } 
+
+    if(lives<2 && hit3)
+    {
+        playTone( 987.770, 100 );
+        hit3 = false;
+    } 
+
+    if(lives<1 && hit4)
+    {
+        playTone( 987.770, 100 );
+        hit4 = false;
+    } 
+
+    if(ending_tune)
+    {
+        playTone( 783.990, 100 ); 
+        _delay_ms(200);
+        playTone( 987.770, 100 );
+        _delay_ms(200);
+        playTone( 1046.500, 100 ); 
+        _delay_ms(200);    
+
+        ending_tune = false;
+    }
 }
